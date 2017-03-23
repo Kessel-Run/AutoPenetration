@@ -1,0 +1,11 @@
+##########################################################
+
+AutoPenetration Script by KesselRun
+
+This is a comprehensive guide to the script and it’s inner workings. Any additional help can be found either by a google search (woah… really?) or looking at this document (yes, this is additional, because sometimes people skip right to emailing me).
+
+Don’t use this tool for hacking without illicit permission from your target. This is a TOOL, not a WEAPON.
+
+##########################################################
+
+[ref. 0000000]: Did you edit the script? If so, and the window in which you edited the code is still open, you can try undoing (⌘+z) your edits until you reach a workable version of the script. If you don’t have your window open, you can either go back in and try to find where the error is (try running the edited script and looking for the error outputs in your console), 
